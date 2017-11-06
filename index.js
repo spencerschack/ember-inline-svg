@@ -20,16 +20,9 @@ module.exports = {
 
   options: function() {
     return merge(true, {}, {
-      paths:   ['public'],
+      files:   [],
       optimize: { /* svgo defaults */ }
     }, (this.app && this.app.options && this.app.options.svg) || {});
-  },
-
-  svgPaths: function() {
-    if (this.isDevelopingAddon()) {
-      return ['tests/dummy/public'];
-    }
-    return this.options().paths;
   },
 
   optimizeSVGs: function(tree) {
@@ -42,17 +35,7 @@ module.exports = {
   },
 
   treeForApp: function(tree) {
-    var existingPaths = this.svgPaths().filter(function(path) {
-      return fs.existsSync(path);
-    });
-
-    var svgTrees = existingPaths.map(function(path) {
-      return new Funnel(path, {
-        include: [new RegExp(/\.svg$/)]
-      });
-    });
-
-    var svgs = mergeTrees(svgTrees, {
+    var svgs = mergeTrees(this.options().files, {
       overwrite: true
     });
 
